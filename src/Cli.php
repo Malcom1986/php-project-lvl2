@@ -12,10 +12,12 @@ function run()
     Usage:
       gendiff (-h|--help)
       gendiff (-v|--version)
+      gendiff [--format <fmt>] <file1> <file2>
 
     Options:
       -h --help                     Show this screen
       -v --version                  Show version
+      --format <fmt>                Report format [default: pretty]
     DOC;
 
     $params = [
