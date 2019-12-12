@@ -1,0 +1,23 @@
+{
+    "name": "malcom/gendiff",
+    "description": "gendiff",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Maksim Litvinov",
+            "email": "litvinovmksm@gmail.com"
+        }
+    ],
+    "scripts" : {
+        "phpcs" : "phpcs"
+    },
+    "autoload": {
+        "files": [
+            "src/Cli.php"
+        ]
+    },
+    "require": {
+        "docopt/docopt": "^1.0"
+    }
+}
