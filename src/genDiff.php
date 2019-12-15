@@ -37,7 +37,7 @@ function getDifference($a, $b)
                 $result["  {$key}"] = $value;
             } else {
                 $result["+ {$key}"] = $value;
-                $result["- {$key}"] = $configData2[$key];
+                $result["- {$key}"] = $configData1[$key];
             }
         } elseif (array_key_exists($key, $configData1) && !array_key_exists($key, $configData2)) {
             $result["- {$key}"] = $value;
