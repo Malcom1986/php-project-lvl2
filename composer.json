@@ -24,5 +24,7 @@
     "require": {
         "docopt/docopt": "^1.0",
         "tightenco/collect": "^6.7"
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
