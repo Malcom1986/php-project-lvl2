@@ -14,10 +14,12 @@
     },
     "autoload": {
         "files": [
-            "src/Cli.php"
+            "src/cli.php",
+            "src/genDiff.php"
         ]
     },
     "require": {
-        "docopt/docopt": "^1.0"
+        "docopt/docopt": "^1.0",
+        "tightenco/collect": "^6.7"
     }
 }

@@ -1,8 +1,10 @@
 <?php
 
-namespace Gendiff\Cli;
+namespace Differ\cli;
 
 use Docopt;
+
+use function Differ\genDiff\genDiff;
 
 function run()
 {
@@ -25,4 +27,7 @@ function run()
     ];
 
     $args = Docopt::handle($doc, $params);
+    $path1 = $args['<file1>'];
+    $path2 = $args['<file2>'];
+    return genDiff($path1, $path2);
 }
