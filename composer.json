@@ -1,5 +1,8 @@
 {
     "name": "malcom/gendiff",
+    "bin": [
+        "bin/gendiff"
+    ],
     "description": "gendiff",
     "type": "project",
     "license": "MIT",
