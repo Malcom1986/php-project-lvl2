@@ -13,14 +13,17 @@
         }
     ],
     "scripts" : {
-        "phpcs" : "phpcs",
-        "phpunit" : "phpunit"
+        "phpcs": "phpcs",
+        "phpunit": "phpunit"
     },
     "autoload": {
         "files": [
             "src/cli.php",
             "src/genDiff.php"
-        ]
+        ],
+        "psr-4": {
+            "Differ\\Tests\\": "tests"
+        }
     },
     "require": {
         "docopt/docopt": "^1.0",
