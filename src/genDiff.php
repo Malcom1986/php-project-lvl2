@@ -21,8 +21,7 @@ function genDiff($path1, $path2)
         echo $e -> getMessage();
         return;
     }
-    echo getDifference($content1, $content2);
-    return;
+    return getDifference($content1, $content2);
 }
 
 function getDifference($a, $b)
@@ -47,7 +46,7 @@ function getDifference($a, $b)
     }
     $string = '';
     foreach ($result as $key => $value) {
-        $string .= "{$key} => {$value}\n";
+        $string .= " {$key} => {$value}\n";
     }
-    return $string;
+    return "{\n{$string}}\n";
 }

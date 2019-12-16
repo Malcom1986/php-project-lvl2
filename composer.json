@@ -13,7 +13,8 @@
         }
     ],
     "scripts" : {
-        "phpcs" : "phpcs"
+        "phpcs" : "phpcs",
+        "phpunit" : "phpunit"
     },
     "autoload": {
         "files": [
@@ -26,5 +27,8 @@
         "tightenco/collect": "^6.7"
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "require-dev": {
+        "phpunit/phpunit": "^8.5"
+    }
 }

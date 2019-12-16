@@ -1,0 +1,10 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=34c9da3e413b5e6a7e3cb5fc5b0f38f76966bf2a33abb6b4230a1073f7112bd0
+
+language: php
+php:
+  - '7.2'
+
+install:
+  - make install
