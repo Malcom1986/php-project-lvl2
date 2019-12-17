@@ -18,11 +18,11 @@
     },
     "autoload": {
         "files": [
-            "src/cli.php",
-            "src/genDiff.php"
+            "src/Cli.php",
+            "src/GenDiff.php"
         ],
         "psr-4": {
-            "Differ\\Tests\\": "tests"
+            "Differ\\Tests\\": "tests/"
         }
     },
     "require": {
