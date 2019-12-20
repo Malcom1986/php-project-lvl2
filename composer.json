@@ -19,7 +19,8 @@
     "autoload": {
         "files": [
             "src/Cli.php",
-            "src/GenDiff.php"
+            "src/GenDiff.php",
+            "src/Parser.php"
         ],
         "psr-4": {
             "Differ\\Tests\\": "tests/"
@@ -27,7 +28,8 @@
     },
     "require": {
         "docopt/docopt": "^1.0",
-        "tightenco/collect": "^6.7"
+        "tightenco/collect": "^6.7",
+        "symfony/yaml": "^5.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

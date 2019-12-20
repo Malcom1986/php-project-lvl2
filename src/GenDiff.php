@@ -2,7 +2,7 @@
 
 namespace Differ\GenDiff;
 
-use Exception;
+use function Differ\Parser\getDataParser;
 
 function openFile($path)
 {
@@ -14,20 +14,30 @@ function openFile($path)
 
 function genDiff($path1, $path2)
 {
+    $dataFormat = pathinfo($path1, PATHINFO_EXTENSION);
+
     try {
         $content1 = openFile($path1);
         $content2 = openFile($path2);
     } catch (\Exception $e) {
-        echo $e -> getMessage();
+        echo $e->getMessage();
         return;
     }
-    return getDifference($content1, $content2);
+
+    try {
+        $parse = getDataParser($dataFormat);
+    } catch (\Exception $e) {
+        echo $e->getMessage();
+        return;
+    }
+
+    $configData1 = $parse($content1);
+    $configData2 = $parse($content2);
+    return getDifference($configData1, $configData2);
 }
 
-function getDifference($a, $b)
+function getDifference($configData1, $configData2)
 {
-    $configData1 = json_decode($a, true);
-    $configData2 = json_decode($b, true);
     $merged = array_merge($configData1, $configData2);
     $result = [];
     foreach ($merged as $key => $value) {
