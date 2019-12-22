@@ -15,24 +15,11 @@ function openFile($path)
 function genDiff($path1, $path2)
 {
     $dataFormat = pathinfo($path1, PATHINFO_EXTENSION);
-
-    try {
-        $content1 = openFile($path1);
-        $content2 = openFile($path2);
-    } catch (\Exception $e) {
-        echo $e->getMessage();
-        return;
-    }
-
-    try {
-        $parse = getDataParser($dataFormat);
-    } catch (\Exception $e) {
-        echo $e->getMessage();
-        return;
-    }
-
-    $configData1 = $parse($content1);
-    $configData2 = $parse($content2);
+    $content1 = openFile($path1);
+    $content2 = openFile($path2);
+    $parseContent = getDataParser($dataFormat);
+    $configData1 = $parseContent($content1);
+    $configData2 = $parseContent($content2);
     return getDifference($configData1, $configData2);
 }
 

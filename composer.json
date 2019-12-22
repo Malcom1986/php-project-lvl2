@@ -29,7 +29,8 @@
     "require": {
         "docopt/docopt": "^1.0",
         "tightenco/collect": "^6.7",
-        "symfony/yaml": "^5.0"
+        "symfony/yaml": "^5.0",
+        "funct/funct": "^1.5"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

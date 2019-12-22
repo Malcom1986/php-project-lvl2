@@ -2,7 +2,6 @@
 
 namespace Differ\Tests;
 
-use Exception;
 use PHPUnit\Framework\TestCase;
 
 use function Differ\GenDiff\genDiff;
@@ -25,5 +24,27 @@ class GenDiffTest extends TestCase
         $diff = genDiff($file1, $file2);
         $expected = file_get_contents('tests/fixtures/expected1');
         $this->assertEquals($expected, $diff);
+    }
+
+    public function testGenDiffWithNonexistentFile()
+    {
+        $this->expectException(\Exception::class);
+        gendiff('notExistingFile1', 'notExistingFile2');
+    }
+
+    public function testGenDiffWithIncorrectJson()
+    {
+        $this->expectException(\Exception::class);
+        $file1 = 'tests/fixtures/incorrect.json';
+        $file2 = 'tests/fixtures/second.json';
+        gendiff($file1, $file2);
+    }
+
+    public function testGenDiffWithUnsupportedFormat()
+    {
+        $this->expectException(\Exception::class);
+        $file1 = 'tests/fixtures/unsupported.txt';
+        $file2 = 'tests/fixtures/unsupported.txt';
+        gendiff($file1, $file2);
     }
 }
