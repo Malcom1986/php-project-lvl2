@@ -20,7 +20,8 @@
         "files": [
             "src/Cli.php",
             "src/GenDiff.php",
-            "src/Parser.php"
+            "src/Parser.php",
+            "src/Renderer.php"
         ],
         "psr-4": {
             "Differ\\Tests\\": "tests/"

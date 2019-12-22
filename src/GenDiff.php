@@ -3,6 +3,7 @@
 namespace Differ\GenDiff;
 
 use function Differ\Parser\getDataParser;
+use function Differ\Renderer\render;
 
 function openFile($path)
 {
@@ -20,30 +21,41 @@ function genDiff($path1, $path2)
     $parseContent = getDataParser($dataFormat);
     $configData1 = $parseContent($content1);
     $configData2 = $parseContent($content2);
-    return getDifference($configData1, $configData2);
+    $difference = getDifference($configData1, $configData2);
+    return render($difference);
 }
 
 function getDifference($configData1, $configData2)
 {
-    $merged = array_merge($configData1, $configData2);
-    $result = [];
-    foreach ($merged as $key => $value) {
-        if (array_key_exists($key, $configData2) && array_key_exists($key, $configData1)) {
-            if ($value == $configData1[$key]) {
-                $result["  {$key}"] = $value;
+    $diff = [];
+    foreach ($configData1 as $key => $value) {
+        if (array_key_exists($key, $configData2)) {
+            if ($value === $configData2->$key) {
+                $diff[$key] = [
+                    'state' => 'notModified',
+                    'value' => $value
+                ];
             } else {
-                $result["+ {$key}"] = $value;
-                $result["- {$key}"] = $configData1[$key];
+                $diff[$key] = [
+                    'state' => 'modified',
+                    'oldValue' => $value,
+                    'newValue' => $configData2->$key
+                ];
             }
-        } elseif (array_key_exists($key, $configData1) && !array_key_exists($key, $configData2)) {
-            $result["- {$key}"] = $value;
         } else {
-            $result["+ {$key}"] = $value;
+            $diff[$key] = [
+                'state' => 'deleted',
+                'value' => $value
+            ];
         }
     }
-    $string = '';
-    foreach ($result as $key => $value) {
-        $string .= " {$key} => {$value}\n";
+    foreach ($configData2 as $key => $value) {
+        if (!array_key_exists($key, $configData1)) {
+            $diff[$key] = [
+                'state' => 'added',
+                'value' => $value
+            ];
+        }
     }
-    return "{\n{$string}}\n";
+    return $diff;
 }

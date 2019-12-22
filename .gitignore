@@ -2,3 +2,4 @@
 .DS_Store
 clover.xml
 *.cache
+temp.php
