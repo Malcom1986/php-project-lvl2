@@ -13,7 +13,7 @@ class GenDiffTest extends TestCase
         $file1 = 'tests/fixtures/first.json';
         $file2 = 'tests/fixtures/second.json';
         $diff = genDiff($file1, $file2);
-        $expected = file_get_contents('tests/fixtures/expected1');
+        $expected = file_get_contents('tests/fixtures/expectedFlat');
         $this->assertEquals($expected, $diff);
     }
 
@@ -22,7 +22,7 @@ class GenDiffTest extends TestCase
         $file1 = 'tests/fixtures/before.yaml';
         $file2 = 'tests/fixtures/after.yaml';
         $diff = genDiff($file1, $file2);
-        $expected = file_get_contents('tests/fixtures/expected1');
+        $expected = file_get_contents('tests/fixtures/expectedFlat');
         $this->assertEquals($expected, $diff);
     }
 
@@ -46,5 +46,23 @@ class GenDiffTest extends TestCase
         $file1 = 'tests/fixtures/unsupported.txt';
         $file2 = 'tests/fixtures/unsupported.txt';
         gendiff($file1, $file2);
+    }
+
+    public function testGenDiffRecursiveJson()
+    {
+        $file1 = 'tests/fixtures/before.json';
+        $file2 = 'tests/fixtures/after.json';
+        $diff = genDiff($file1, $file2);
+        $expected = file_get_contents('tests/fixtures/expected');
+        $this->assertEquals($expected, $diff);
+    }
+
+    public function testGenDiffRecursiveYaml()
+    {
+        $file1 = 'tests/fixtures/beforeRecursive.yml';
+        $file2 = 'tests/fixtures/afterRecursive.yml';
+        $diff = genDiff($file1, $file2);
+        $expected = file_get_contents('tests/fixtures/expected');
+        $this->assertEquals($expected, $diff);
     }
 }

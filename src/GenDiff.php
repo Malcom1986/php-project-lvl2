@@ -29,32 +29,38 @@ function getDifference($configData1, $configData2)
 {
     $diff = [];
     foreach ($configData1 as $key => $value) {
-        if (array_key_exists($key, $configData2)) {
-            if ($value === $configData2->$key) {
-                $diff[$key] = [
-                    'state' => 'notModified',
-                    'value' => $value
-                ];
+        if (array_key_exists($key, $configData2) && is_object($value) && is_object($configData2->$key)) {
+            $diff[$key] = [
+                'child' => getDifference($value, $configData2->$key)
+            ];
+        } else {
+            if (array_key_exists($key, $configData2)) {
+                if ($value === $configData2->$key) {
+                    $diff[$key] = [
+                        'state' => 'notModified',
+                        'value' => $value
+                    ];
+                } else {
+                    $diff[$key] = [
+                        'state' => 'modified',
+                        'oldValue' => $value,
+                        'newValue' => $configData2->$key
+                    ];
+                }
             } else {
                 $diff[$key] = [
-                    'state' => 'modified',
-                    'oldValue' => $value,
-                    'newValue' => $configData2->$key
+                    'state' => 'deleted',
+                    'value' => $value
                 ];
             }
-        } else {
-            $diff[$key] = [
-                'state' => 'deleted',
-                'value' => $value
-            ];
         }
-    }
-    foreach ($configData2 as $key => $value) {
-        if (!array_key_exists($key, $configData1)) {
-            $diff[$key] = [
-                'state' => 'added',
-                'value' => $value
-            ];
+        foreach ($configData2 as $key => $value) {
+            if (!array_key_exists($key, $configData1)) {
+                $diff[$key] = [
+                    'state' => 'added',
+                    'value' => $value
+                ];
+            }
         }
     }
     return $diff;
