@@ -1,8 +1,8 @@
 <?php
 
-namespace Differ\Renderer;
+namespace Differ\Formatters\PrettyFormatter;
 
-function render($diff)
+function formatPretty($diff)
 {
     
     $recursive = function ($diff) use (&$recursive) {

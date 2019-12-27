@@ -3,7 +3,7 @@
 namespace Differ\GenDiff;
 
 use function Differ\Parser\getDataParser;
-use function Differ\Renderer\render;
+use function Differ\Formatters\Format\formatOutput;
 
 function openFile($path)
 {
@@ -13,7 +13,7 @@ function openFile($path)
     return file_get_contents($path);
 }
 
-function genDiff($path1, $path2)
+function genDiff($path1, $path2, $format)
 {
     $dataFormat = pathinfo($path1, PATHINFO_EXTENSION);
     $content1 = openFile($path1);
@@ -21,47 +21,31 @@ function genDiff($path1, $path2)
     $parseContent = getDataParser($dataFormat);
     $configData1 = $parseContent($content1);
     $configData2 = $parseContent($content2);
-    $difference = getDifference($configData1, $configData2);
-    return render($difference);
+    $difference = getDifference((array) $configData1, (array) $configData2);
+    return formatOutput($format, $difference);
 }
 
-function getDifference($configData1, $configData2)
+function getDifference($data1, $data2)
 {
-    $diff = [];
-    foreach ($configData1 as $key => $value) {
-        if (array_key_exists($key, $configData2) && is_object($value) && is_object($configData2->$key)) {
-            $diff[$key] = [
-                'child' => getDifference($value, $configData2->$key)
-            ];
-        } else {
-            if (array_key_exists($key, $configData2)) {
-                if ($value === $configData2->$key) {
-                    $diff[$key] = [
-                        'state' => 'notModified',
-                        'value' => $value
-                    ];
-                } else {
-                    $diff[$key] = [
-                        'state' => 'modified',
-                        'oldValue' => $value,
-                        'newValue' => $configData2->$key
-                    ];
-                }
-            } else {
-                $diff[$key] = [
-                    'state' => 'deleted',
-                    'value' => $value
-                ];
-            }
-        }
-        foreach ($configData2 as $key => $value) {
-            if (!array_key_exists($key, $configData1)) {
-                $diff[$key] = [
-                    'state' => 'added',
-                    'value' => $value
-                ];
-            }
+    $keys = union(array_keys($data1), array_keys($data2));
+    $result = [];
+    foreach ($keys as $key) {
+        if (!array_key_exists($key, $data1)) {
+            $result[$key] = ['state' => 'added', 'value' => $data2[$key]];
+        } elseif (!array_key_exists($key, $data2)) {
+            $result[$key] = ['state' => 'deleted', 'value' => $data1[$key]];
+        } elseif (is_object($data1[$key]) && is_object($data2[$key])) {
+            $result[$key] = ['child' => getDifference((array) $data1[$key], (array) $data2[$key])];
+        } elseif ($data1[$key] !== $data2[$key]) {
+            $result[$key] = ['state' => 'changed', 'oldValue' => $data1[$key], 'newValue' => $data2[$key]];
+        } elseif ($data1[$key] === $data2[$key]) {
+            $result[$key] = ['state' => 'unchanged', 'value' => $data1[$key]];
         }
     }
-    return $diff;
+    return $result;
+}
+
+function union($data1, $data2)
+{
+    return array_unique(array_merge($data1, $data2));
 }

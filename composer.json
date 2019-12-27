@@ -21,7 +21,9 @@
             "src/Cli.php",
             "src/GenDiff.php",
             "src/Parser.php",
-            "src/Renderer.php"
+            "src/Formatters/Format.php",
+            "src/Formatters/PlainFormatter.php",
+            "src/Formatters/PrettyFormatter.php"
         ],
         "psr-4": {
             "Differ\\Tests\\": "tests/"

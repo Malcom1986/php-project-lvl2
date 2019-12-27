@@ -27,8 +27,8 @@ function run()
     ];
 
     $args = Docopt::handle($doc, $params);
-    $path1 = $args['<file1>'];
-    $path2 = $args['<file2>'];
-    echo genDiff($path1, $path2), "\n";
+    ['<file1>' => $path1, '<file2>' => $path2, '--format' => $format] = $args;
+    $output = genDiff($path1, $path2, $format);
+    echo $output, "\n";
     return;
 }

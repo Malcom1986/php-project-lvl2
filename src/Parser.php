@@ -21,6 +21,6 @@ function getDataParser($dataFormat)
         case 'yml':
             return $parseYaml;
         default:
-            throw new \Exception("Unsupported format {$dataFormat}");
+            throw new \Exception("Unsupported configuration format {$dataFormat}");
     }
 }
