@@ -31,15 +31,15 @@ function getDifference($data1, $data2)
     $result = [];
     foreach ($keys as $key) {
         if (!array_key_exists($key, $data1)) {
-            $result[$key] = ['state' => 'added', 'value' => $data2[$key]];
+            $result[$key] = ['state' => 'added', 'oldValue' => null, 'newValue' => $data2[$key]];
         } elseif (!array_key_exists($key, $data2)) {
-            $result[$key] = ['state' => 'deleted', 'value' => $data1[$key]];
+            $result[$key] = ['state' => 'deleted', 'oldValue' => $data1[$key], 'newValue' => null];
         } elseif (is_object($data1[$key]) && is_object($data2[$key])) {
             $result[$key] = ['child' => getDifference((array) $data1[$key], (array) $data2[$key])];
         } elseif ($data1[$key] !== $data2[$key]) {
             $result[$key] = ['state' => 'changed', 'oldValue' => $data1[$key], 'newValue' => $data2[$key]];
         } elseif ($data1[$key] === $data2[$key]) {
-            $result[$key] = ['state' => 'unchanged', 'value' => $data1[$key]];
+            $result[$key] = ['state' => 'unchanged', 'oldValue' => $data1[$key], 'newValue' => $data1[$key]];
         }
     }
     return $result;

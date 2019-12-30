@@ -5,25 +5,29 @@ namespace Differ\Formatters\PlainFormatter;
 function formatPlain($diff)
 {
     $result = '';
-    $recursive = function ($diff, $stack) use ($result, &$recursive) {
+    $recursive = function ($diff, $propertyNameStack) use ($result, &$recursive) {
         foreach ($diff as $key => $value) {
-            array_push($stack, $key);
+            array_push($propertyNameStack, $key);
             if (array_key_exists('child', $value)) {
-                $result .= $recursive($value['child'], $stack);
+                $result .= $recursive($value['child'], $propertyNameStack);
             } else {
+                $property = stringifyProperty($propertyNameStack);
                 switch ($value['state']) {
                     case 'changed':
-                        $result .= "Property " . stringifyProperty($stack) . " was changed. From " . stringifyValue($value['oldValue']) . " to " . stringifyValue($value['newValue']) . "\n";
+                        $oldValue = stringifyValue($value['oldValue']);
+                        $newValue = stringifyValue($value['newValue']);
+                        $result .= "Property {$property} was changed. From {$oldValue} to {$newValue}\n";
                         break;
                     case 'added':
-                        $result .= "Property " . stringifyProperty($stack) . " was added with value: "  . stringifyValue($value['value']) . "\n";
+                        $newValue = stringifyValue($value['newValue']);
+                        $result .= "Property {$property} was added with value: {$newValue}\n";
                         break;
                     case 'deleted':
-                        $result .= "Property " . stringifyProperty($stack) . " was removed" . "\n";
+                        $result .= "Property {$property} was removed\n";
                         break;
                 }
             }
-            array_pop($stack);
+            array_pop($propertyNameStack);
         }
         return $result;
     };

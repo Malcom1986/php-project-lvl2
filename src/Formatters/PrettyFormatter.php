@@ -13,17 +13,17 @@ function formatPretty($diff)
             } else {
                 switch ($value['state']) {
                     case 'unchanged':
-                        $result["  {$key}"] = $value['value'];
+                        $result["  {$key}"] = $value['oldValue'];
                         break;
                     case 'changed':
                         $result["- {$key}"] = $value['oldValue'];
                         $result["+ {$key}"] = $value['newValue'];
                         break;
                     case 'deleted':
-                        $result["- {$key}"] = $value['value'];
+                        $result["- {$key}"] = $value['oldValue'];
                         break;
                     case 'added':
-                        $result["+ {$key}"] = $value['value'];
+                        $result["+ {$key}"] = $value['newValue'];
                         break;
                 }
             }
