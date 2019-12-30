@@ -1,0 +1,55 @@
+{
+    "common": {
+        "setting1": {
+            "state": "unchanged",
+            "value": "Value 1"
+        },
+        "setting2": {
+            "state": "deleted",
+            "value": 200
+        },
+        "setting3": {
+            "state": "unchanged",
+            "value": true
+        },
+        "setting6": {
+            "state": "deleted",
+            "value": {
+                "key": "value"
+            }
+        },
+        "setting4": {
+            "state": "added",
+            "value": "blah blah"
+        },
+        "setting5": {
+            "state": "added",
+            "value": {
+                "key5": "value5"
+            }
+        }
+    },
+    "group1": {
+        "baz": {
+            "state": "changed",
+            "oldValue": "bas",
+            "newValue": "bars"
+        },
+        "foo": {
+            "state": "unchanged",
+            "value": "bar"
+        }
+    },
+    "group2": {
+        "state": "deleted",
+        "value": {
+            "abc": 12345
+        }
+    },
+    "group3": {
+        "state": "added",
+        "value": {
+            "fee": 100500
+        }
+    }
+}

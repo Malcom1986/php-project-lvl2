@@ -66,7 +66,7 @@ class GenDiffTest extends TestCase
         $this->assertEquals($expected, $diff);
     }
 
-    public function testGenDiffWithFlatFormat()
+    public function testGenDiffWithPlainOutput()
     {
         $file1 = 'tests/fixtures/beforeRecursive.yml';
         $file2 = 'tests/fixtures/afterRecursive.yml';
@@ -81,5 +81,14 @@ class GenDiffTest extends TestCase
         $file1 = 'tests/fixtures/beforeRecursive.yml';
         $file2 = 'tests/fixtures/afterRecursive.yml';
         gendiff($file1, $file2, 'text');
+    }
+
+    public function testGenDiffWithJsonOutput()
+    {
+        $file1 = 'tests/fixtures/beforeRecursive.yml';
+        $file2 = 'tests/fixtures/afterRecursive.yml';
+        $diff = genDiff($file1, $file2, 'json');
+        $expected = file_get_contents('tests/fixtures/expectedJson');
+        $this->assertEquals($expected, $diff);
     }
 }

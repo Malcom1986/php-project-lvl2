@@ -19,7 +19,7 @@ function formatPlain($diff)
                         $result .= "Property {$property} was changed. From {$oldValue} to {$newValue}\n";
                         break;
                     case 'added':
-                        $newValue = stringifyValue($value['newValue']);
+                        $newValue = stringifyValue($value['value']);
                         $result .= "Property {$property} was added with value: {$newValue}\n";
                         break;
                     case 'deleted':

@@ -4,7 +4,6 @@ namespace Differ\Formatters\PrettyFormatter;
 
 function formatPretty($diff)
 {
-    
     $recursive = function ($diff) use (&$recursive) {
         $result = [];
         foreach ($diff as $key => $value) {
@@ -13,17 +12,17 @@ function formatPretty($diff)
             } else {
                 switch ($value['state']) {
                     case 'unchanged':
-                        $result["  {$key}"] = $value['oldValue'];
+                        $result["  {$key}"] = $value['value'];
                         break;
                     case 'changed':
                         $result["- {$key}"] = $value['oldValue'];
                         $result["+ {$key}"] = $value['newValue'];
                         break;
                     case 'deleted':
-                        $result["- {$key}"] = $value['oldValue'];
+                        $result["- {$key}"] = $value['value'];
                         break;
                     case 'added':
-                        $result["+ {$key}"] = $value['newValue'];
+                        $result["+ {$key}"] = $value['value'];
                         break;
                 }
             }
