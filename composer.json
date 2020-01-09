@@ -18,6 +18,7 @@
     },
     "autoload": {
         "files": [
+            "src/Node.php",
             "src/Cli.php",
             "src/GenDiff.php",
             "src/Parser.php",

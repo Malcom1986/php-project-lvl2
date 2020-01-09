@@ -2,49 +2,34 @@
 
 namespace Differ\Formatters\PlainFormatter;
 
+use function Differ\Node\{getKey, getState, getValue, getOldValue, getChildren, hasChildren};
+
 function formatPlain($diff)
 {
-    $result = '';
-    $recursive = function ($diff, $propertyNameStack) use ($result, &$recursive) {
-        foreach ($diff as $key => $value) {
-            array_push($propertyNameStack, $key);
-            if (array_key_exists('child', $value)) {
-                $result .= $recursive($value['child'], $propertyNameStack);
+    $formatPlain = function ($diff, $propNameStack) use (&$formatPlain) {
+        return array_reduce($diff, function ($acc, $node) use (&$formatPlain, $propNameStack) {
+            array_push($propNameStack, getKey($node));
+            if (hasChildren($node)) {
+                $acc .= $formatPlain(getChildren($node), $propNameStack);
             } else {
-                $property = stringifyProperty($propertyNameStack);
-                switch ($value['state']) {
+                $property = implode('.', $propNameStack);
+                $value = is_object(getValue($node)) ? 'complex value' : getValue($node);
+                switch (getState($node)) {
                     case 'changed':
-                        $oldValue = stringifyValue($value['oldValue']);
-                        $newValue = stringifyValue($value['newValue']);
-                        $result .= "Property {$property} was changed. From {$oldValue} to {$newValue}\n";
+                        $oldValue = is_object(getOldValue($node)) ? 'complex value' : getOldValue($node);
+                        $acc .= "Property '{$property}' was changed. From '{$oldValue}' to '{$value}'\n";
                         break;
                     case 'added':
-                        $newValue = stringifyValue($value['value']);
-                        $result .= "Property {$property} was added with value: {$newValue}\n";
+                        $acc .= "Property '{$property}' was added with value: '{$value}'\n";
                         break;
                     case 'deleted':
-                        $result .= "Property {$property} was removed\n";
+                        $acc .= "Property '{$property}' was removed\n";
                         break;
                 }
+                array_pop($propNameStack);
             }
-            array_pop($propertyNameStack);
-        }
-        return $result;
+            return $acc;
+        }, '');
     };
-    return $recursive($diff, []);
-}
-
-
-function stringifyValue($value)
-{
-    if (is_object($value)) {
-        return "'complex value'";
-    }
-    return "'{$value}'";
-}
-
-function stringifyProperty(array $property)
-{
-    $propertyName = implode('.', $property);
-    return "'{$propertyName}'";
+    return $formatPlain($diff, []);
 }

@@ -10,8 +10,11 @@
 
 ----
 ### Install:
+
 `$ composer global require malcom/gendiff`
+
 ----
+
 ### Usage:
 ```
       gendiff (-h|--help)
@@ -24,31 +27,36 @@
       --format <fmt>                Report format [default: pretty]
 ```
 
-**Gendiff can works with different configuration files formats:**
+### Gendiff can works with different configuration files formats:
 1. JSON format
+
 `$ gendiff before.json after.json`
  
 [![asciicast](https://asciinema.org/a/9XUWV7uFG3rfqMKdWPLjK75vg.svg)](https://asciinema.org/a/9XUWV7uFG3rfqMKdWPLjK75vg)
 
 2. YAML format
+
 `$ gendiff before.yaml after.yaml`
 
 [![asciicast](https://asciinema.org/a/zgOT9KgIXPHb81jC0eMNkqF11.svg)](https://asciinema.org/a/zgOT9KgIXPHb81jC0eMNkqF11)
 
-**Gendiff can works with recursive configuration files:**
+###Gendiff can works with recursive configuration files:
 
 [![asciicast](https://asciinema.org/a/T4as3zKiypIpCLNjXQgmFhq76.svg)](https://asciinema.org/a/T4as3zKiypIpCLNjXQgmFhq76)
 
 
-**Gendiff generates output data in different formats:**
+### Gendiff generates output data in different formats:
+
 1. Pretty format (default)
 
 2. Text format
+
 `gendiff --format plain before.yaml after.yaml`
 
 [![asciicast](https://asciinema.org/a/VqnDwNZRGYI3SEg8V2KaI8mbI.svg)](https://asciinema.org/a/VqnDwNZRGYI3SEg8V2KaI8mbI)
 
 3. JSON format
+
 `gendiff --format json before.yaml after.yaml`
 
 [![asciicast](https://asciinema.org/a/PR2fryK3hr7LMkYrFaGkiHjcv.svg)](https://asciinema.org/a/PR2fryK3hr7LMkYrFaGkiHjcv)

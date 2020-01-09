@@ -32,8 +32,8 @@
     "group1": {
         "baz": {
             "state": "changed",
-            "oldValue": "bas",
-            "newValue": "bars"
+            "value": "bars",
+            "oldValue": "bas"
         },
         "foo": {
             "state": "unchanged",

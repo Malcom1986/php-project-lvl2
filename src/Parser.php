@@ -24,3 +24,10 @@ function getDataParser($dataFormat)
             throw new \Exception("Unsupported configuration format {$dataFormat}");
     }
 }
+
+function getDataParser1($format)
+{
+    $renderers = [
+        'json'
+    ];
+}
