@@ -2,36 +2,33 @@
 
 namespace Differ\Formatters\PrettyFormatter;
 
-use function Differ\Node\{getKey, getState, getValue, getOldValue, getChildren, hasChildren};
+use function Differ\Node\{getName, getType, getValue};
 
-function formatPretty($diff)
+function formatPretty($tree)
 {
-    $formatPretty = function ($diff) use (&$formatPretty) {
-        return array_reduce($diff, function ($acc, $node) use (&$formatPretty) {
-            $key = getKey($node);
+    $formatters = [
+        'nested' => fn ($key, $value, $fn) => ["  {$key}" => $fn($value)],
+        'added' => fn ($key, $value) => ["+ {$key}" => $value],
+        'deleted' => fn ($key, $value) => ["- {$key}" => $value],
+        'unchanged' => fn ($key, $value) => ["  {$key}" => $value],
+        'changed' => fn ($key, $value) => ["- {$key}" => $value['old'], "+ {$key}" => $value['new']]
+    ];
+
+    $formatPretty = function ($tree) use ($formatters, &$formatPretty) {
+        $formattedTree = array_map(function ($node) use ($formatters, &$formatPretty) {
+            $nodeType = getType($node);
+            $formatNode = $formatters[$nodeType];
+            $key = getName($node);
             $value = getValue($node);
-            if (hasChildren($node)) {
-                $acc["  {$key}"] = $formatPretty(getChildren($node));
-            } else {
-                switch (getState($node)) {
-                    case 'unchanged':
-                        $acc["  {$key}"] = $value;
-                        break;
-                    case 'changed':
-                        $acc["- {$key}"] = getOldValue($node);
-                        $acc["+ {$key}"] = $value;
-                        break;
-                    case 'deleted':
-                        $acc["- {$key}"] = $value;
-                        break;
-                    case 'added':
-                        $acc["+ {$key}"] = $value;
-                        break;
-                }
-            }
-            return $acc;
-        }, []);
+            return $formatNode($key, $value, $formatPretty);
+        }, $tree);
+        return flatten($formattedTree);
     };
-    $formatted = $formatPretty($diff);
-    return str_replace(['"', ','], '', json_encode($formatted, JSON_PRETTY_PRINT));
+    $json = json_encode($formatPretty($tree), JSON_PRETTY_PRINT);
+    return str_replace(['"', ','], '', $json);
+}
+
+function flatten($array)
+{
+    return collect($array)->flatMap(fn ($item) => $item)->all();
 }

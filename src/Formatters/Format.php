@@ -6,7 +6,8 @@ use function Differ\Formatters\PlainFormatter\formatPlain;
 use function Differ\Formatters\PrettyFormatter\formatPretty;
 use function Differ\Formatters\JsonFormatter\formatJson;
 
-function formatOutput($format, $diff)
+
+function formatOutput1($format, $diff)
 {
     switch ($format) {
         case 'pretty':
@@ -20,3 +21,4 @@ function formatOutput($format, $diff)
             break;
     }
 }
+

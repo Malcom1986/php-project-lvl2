@@ -2,43 +2,26 @@
 
 namespace Differ\Node;
 
-function createNode($key, $state, $value, $oldValue = null, $children = [])
+function createNode($name, $type, $value)
 {
     return [
-        'key' => $key,
-        'state' => $state,
-        'currentValue' => $value,
-        'oldValue' => $oldValue,
-        'children' => $children
+        'name' => $name,
+        'type' => $type,
+        'value' => $value,
     ];
 }
 
-function hasChildren($node)
+function getType($node)
 {
-    return count(getChildren($node)) > 0;
-}
-
-function getChildren($node)
-{
-    return $node['children'];
-}
-
-function getState($node)
-{
-    return $node['state'];
+    return $node['type'];
 }
 
 function getValue($node)
 {
-    return $node['currentValue'];
+    return $node['value'];
 }
 
-function getOldValue($node)
+function getName($node)
 {
-    return $node['oldValue'];
-}
-
-function getKey($node)
-{
-    return $node['key'];
+    return $node['name'];
 }

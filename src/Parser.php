@@ -4,30 +4,16 @@ namespace Differ\Parser;
 
 use Symfony\Component\Yaml\Yaml;
 
-function getDataParser($dataFormat)
+function getDataParser($configFormat)
 {
-    $parseYaml = function ($inputData) {
-        return Yaml::parse($inputData, Yaml::PARSE_OBJECT_FOR_MAP);
-    };
-
-    $parseJson = function ($inputData) {
-        return $parsedData = json_decode($inputData, false, 512, JSON_THROW_ON_ERROR);
-    };
-
-    switch ($dataFormat) {
-        case 'json':
-            return $parseJson;
-        case 'yaml':
-        case 'yml':
-            return $parseYaml;
-        default:
-            throw new \Exception("Unsupported configuration format {$dataFormat}");
-    }
-}
-
-function getDataParser1($format)
-{
-    $renderers = [
-        'json'
+    $formats = [
+        'yaml' => fn ($config) => Yaml::parse($config, Yaml::PARSE_OBJECT_FOR_MAP),
+        'yml' => fn ($config) => Yaml::parse($config, Yaml::PARSE_OBJECT_FOR_MAP),
+        'json' => fn ($config) => json_decode($config, false, 512, JSON_THROW_ON_ERROR)
     ];
+
+    if (!array_key_exists($configFormat, $formats)) {
+        throw new \Exception('Unsupported file format');
+    }
+    return $formats[$configFormat];
 }
