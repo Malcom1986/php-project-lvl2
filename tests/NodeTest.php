@@ -4,76 +4,59 @@ namespace Differ\Tests;
 
 use PHPUnit\Framework\TestCase;
 
-use function Differ\Node\{createNode, hasChildren, getChildren, getState, getValue, getOldValue};
+use function Differ\Node\{createNode, getType, getValue, getName};
 
 class NodeTest extends TestCase
 {
     public function testCreateNode()
     {
-        $node = createNode('name', 'changed', 'John', 'Eva', [
+        $node = createNode('names', 'nested', [
             createNode('John', 'added', 'male'),
             createNode('Eva', 'deleted', 'female')]);
+        
+
         $expected = [
-            'key' => 'name',
-            'state' => 'changed',
-            'currentValue' => 'John',
-            'oldValue' => 'Eva',
-            'children' => [
+            'name' => 'names',
+            'type' => 'nested',
+            'value' => [
                 [
-                    'key' => 'John',
-                    'state' => 'added',
-                    'currentValue' => 'male',
-                    'oldValue' => null,
-                    'children' => []
+                    'name' => 'John',
+                    'type' => 'added',
+                    'value' => 'male',
                 ],
                 [
-                    'key' => 'Eva',
-                    'state' => 'deleted',
-                    'currentValue' => 'female',
-                    'oldValue' => null,
-                    'children' => []
+                    'name' => 'Eva',
+                    'type' => 'deleted',
+                    'value' => 'female',
                 ]
             ]
-
         ];
+
         $this->assertEquals($expected, $node);
     }
 
-    public function testHasChildren()
+
+    public function testGetType()
     {
         $node1 = createNode('number', 'added', 3);
-        $node2 = createNode('name', null, null, null, createNode('John', 'added', 'male'));
-        $this->assertFalse(hasChildren($node1));
-        $this->assertTrue(hasChildren($node2));
+        $this->assertEquals('added', getType($node1));
     }
 
-    public function testGetState()
-    {
-        $node1 = createNode('number', 'added', 3);
-        $this->assertEquals('added', getState($node1));
-    }
-
-    public function testGetChildren()
-    {
-        $node = createNode('name', null, null, null, [
-            createNode('John', 'added', 'male'),
-            createNode('Eva', 'added', 'female')]);
-        $children = [
-            createNode('John', 'added', 'male'),
-            createNode('Eva', 'added', 'female')
-        ];
-        $this->assertEquals($children, getChildren($node));
-    }
-
+    
     public function testGetValue()
     {
-        $node = createNode('name', 'changed', 'John', 'Eva');
-        $this->assertEquals('John', getValue($node));
+        $node = createNode('name', 'changed', ['new' => 'John','old' => 'Eva']);
+        $expected = [
+            'new' => 'John',
+            'old' => 'Eva'
+        ];
+
+        $this->assertEquals($expected, getValue($node));
     }
 
-    public function testGetOldValue()
+    public function testGetName()
     {
-        $node = createNode('name', 'changed', 'John', 'Eva');
-        $this->assertEquals('Eva', getOldValue($node));
+        $node = createNode('host', 'unchanged', '127.0.0.0');
+        $this->assertEquals('host', getName($node));
     }
 }

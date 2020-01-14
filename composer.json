@@ -26,7 +26,8 @@
             "src/Formatters/PlainFormatter.php",
             "src/Formatters/PrettyFormatter.php",
             "src/Formatters/JsonFormatter.php",
-            "src/Ast.php"
+            "src/Ast.php",
+            "src/Functions.php"
         ],
         "psr-4": {
             "Differ\\Tests\\": "tests/"

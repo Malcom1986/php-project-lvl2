@@ -12,7 +12,7 @@ function formatPlain($tree)
         'nested'  => fn ($name, $value, $fn, $stack) => $fn($value, $stack),
         'added' => fn ($name, $value) => "Property '{$name}' was added with value: '{$value}'",
         'deleted' => fn ($name) => "Property '{$name}' was removed",
-        'changed' => fn ($name, $value) => "Property '{$name}' was changed. From '{$value['old']}' to '{$value['new']}"
+        'changed' => fn ($name, $value) => "Property '{$name}' was changed. From '{$value['old']}' to '{$value['new']}'"
     ];
     
     $formatPlain = function ($tree, $propNameStack) use (&$formatPlain, $formatters) {

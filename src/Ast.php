@@ -2,7 +2,7 @@
 
 namespace Differ\Ast;
 
-use function Funct\Collection\{union, first};
+use function Funct\Collection\union;
 use function Differ\Node\createNode;
 
 function buildAst($data1, $data2)
@@ -41,7 +41,7 @@ function buildAst($data1, $data2)
         ['type' => $type, 'process' => $process] = $nodeType;
         $value = $process($data1->$key ?? null, $data2->$key ?? null);
         return createNode($key, $type, $value);
-    }, $keys);
+    }, array_values($keys));
 }
 
 function getObjectKeys($tree)

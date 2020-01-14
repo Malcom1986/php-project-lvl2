@@ -3,6 +3,7 @@
 namespace Differ\Formatters\PrettyFormatter;
 
 use function Differ\Node\{getName, getType, getValue};
+use function Differ\Functions\flatten_assoc;
 
 function formatPretty($tree)
 {
@@ -22,13 +23,8 @@ function formatPretty($tree)
             $value = getValue($node);
             return $formatNode($key, $value, $formatPretty);
         }, $tree);
-        return flatten($formattedTree);
+        return flatten_assoc($formattedTree);
     };
     $json = json_encode($formatPretty($tree), JSON_PRETTY_PRINT);
     return str_replace(['"', ','], '', $json);
-}
-
-function flatten($array)
-{
-    return collect($array)->flatMap(fn ($item) => $item)->all();
 }

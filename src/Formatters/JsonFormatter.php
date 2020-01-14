@@ -2,35 +2,29 @@
 
 namespace Differ\Formatters\JsonFormatter;
 
-use function Differ\Node\{getKey, getState, getValue, getOldValue, getChildren, hasChildren};
+use function Differ\Node\{getName, getType, getValue};
+use function Differ\Functions\flatten_assoc;
 
-function formatJson($diff)
+function formatJson($tree)
 {
-    $formatJson = function ($diff) use (&$formatJson) {
-        return array_reduce($diff, function ($acc, $node) use (&$formatJson) {
-            $key = getKey($node);
-            $state = getState($node);
-            if (hasChildren($node)) {
-                $acc[$key] = $formatJson(getChildren($node));
-            } else {
-                switch ($state) {
-                    case 'changed':
-                        $acc[$key] = [
-                            'state' => $state,
-                            'value' => getValue($node),
-                            'oldValue' => getOldValue($node)
-                        ];
-                        break;
-                    default:
-                        $acc[$key] = [
-                            'state' => $state,
-                            'value' => getValue($node)
-                        ];
-                        break;
-                }
-            }
-            return $acc;
-        }, []);
+    $formatters = [
+        'nested' => fn ($value, $fn) => $fn($value),
+        'added' => fn ($value) => $value,
+        'deleted' => fn ($value) => $value,
+        'unchanged' => fn ($value) => $value,
+        'changed' => fn ($value) => $value
+    ];
+
+    $formatJson = function ($tree) use (&$formatJson, $formatters) {
+        $formattedTree = array_map(function ($node) use (&$formatJson, $formatters) {
+            $type = getType($node);
+            $key = getName($node);
+            $value = getValue($node);
+            $formatNode = $formatters[$type];
+            $formatedValue = $formatNode($value, $formatJson);
+            return [$key => ['type' => $type, 'value' => $formatedValue]];
+        }, $tree);
+        return flatten_assoc($formattedTree);
     };
-    return json_encode($formatJson($diff), JSON_PRETTY_PRINT);
+    return json_encode($formatJson($tree), JSON_PRETTY_PRINT);
 }
