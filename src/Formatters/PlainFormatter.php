@@ -18,12 +18,12 @@ function formatPlain($tree)
     $formatPlain = function ($tree, $propNameStack) use (&$formatPlain, $formatters) {
         return array_map(function ($node) use (&$formatPlain, $formatters, $propNameStack) {
             array_push($propNameStack, getName($node));
-            $formatNode = $formatters[getType($node)];
-            $property = implode('.', $propNameStack);
+            $formatValue = $formatters[getType($node)];
+            $propertyName = implode('.', $propNameStack);
             $value = is_object(getValue($node)) ? 'complex value' : getValue($node);
-            $result = $formatNode($property, $value, $formatPlain, $propNameStack);
+            $sentence = $formatValue($propertyName, $value, $formatPlain, $propNameStack);
             array_pop($propNameStack);
-            return $result;
+            return $sentence;
         }, $tree);
     };
     $result = compact(flatten($formatPlain($tree, [])));

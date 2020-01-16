@@ -20,8 +20,8 @@ function formatJson($tree)
             $type = getType($node);
             $key = getName($node);
             $value = getValue($node);
-            $formatNode = $formatters[$type];
-            $formatedValue = $formatNode($value, $formatJson);
+            $formatValue = $formatters[$type];
+            $formatedValue = $formatValue($value, $formatJson);
             return [$key => ['type' => $type, 'value' => $formatedValue]];
         }, $tree);
         return flatten_assoc($formattedTree);

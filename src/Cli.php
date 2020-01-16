@@ -23,7 +23,7 @@ function run()
     DOC;
 
     $params = [
-        'version' => 'v0.0.0'
+        'version' => 'v1.2.0'
     ];
 
     $args = Docopt::handle($doc, $params);

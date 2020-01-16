@@ -6,23 +6,25 @@ use function Differ\Parser\getDataParser;
 use function Differ\Formatters\Format\formatOutput;
 use function Differ\Ast\buildAst;
 
-function genDiff($path1, $path2, $format)
+function genDiff($filePath1, $filePath2, $format)
 {
-    $configFormat = pathinfo($path1, PATHINFO_EXTENSION);
-    $config1 = openFile($path1);
-    $config2 = openFile($path2);
-    $parseConfig = getDataParser($configFormat);
-    $data1 = $parseConfig($config1);
-    $data2 = $parseConfig($config2);
+    $fileFormat1 = pathinfo($filePath1, PATHINFO_EXTENSION);
+    $fileFormat2 = pathinfo($filePath2, PATHINFO_EXTENSION);
+    $content1 = openFile($filePath1);
+    $content2 = openFile($filePath2);
+    $parseConfig1 = getDataParser($fileFormat1);
+    $parseConfig2 = getDataParser($fileFormat2);
+    $data1 = $parseConfig1($content1);
+    $data2 = $parseConfig2($content2);
     $ast = buildAst($data1, $data2);
     return formatOutput($format, $ast);
 }
 
-function openFile($path)
+function openFile($filePath)
 {
-    $realPath = realpath($path);
+    $realPath = realpath($filePath);
     if (!file_exists($realPath)) {
-        throw new \Exception("File {$path} does not exists\n");
+        throw new \Exception("File {$filePath} does not exists\n");
     }
     return file_get_contents($realPath);
 }

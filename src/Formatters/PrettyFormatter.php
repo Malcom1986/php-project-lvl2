@@ -21,10 +21,21 @@ function formatPretty($tree)
             $formatNode = $formatters[$nodeType];
             $key = getName($node);
             $value = getValue($node);
-            return $formatNode($key, $value, $formatPretty);
+            $formatedValue = is_object($value) ? formatObject($value) : $value;
+            return $formatNode($key, $formatedValue, $formatPretty);
         }, $tree);
         return flatten_assoc($formattedTree);
     };
     $json = json_encode($formatPretty($tree), JSON_PRETTY_PRINT);
     return str_replace(['"', ','], '', $json);
+}
+
+function formatObject($object)
+{
+    return collect($object)->mapWithKeys(function ($value, $key) {
+        if (is_array($value)) {
+            return ["  {$key}" => formatObject($value)];
+        }
+        return ["  {$key}" => $value];
+    })->all();
 }
