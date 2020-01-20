@@ -1,62 +1,35 @@
 <?php
 
-namespace Differ\Tests;
+namespace Differ\Test;
 
 use PHPUnit\Framework\TestCase;
 
 use function Differ\GenDiff\genDiff;
 
-class GenDiffTest extends TestCase
+class GenDiffTest2 extends TestCase
 {
     /**
      * @dataProvider genDiffProvider
      */
-    public function testGenDiff($filePath1, $filePath2, $format, $pathToExpected)
+    public function testGenDiff($inputFormat, $outputFormat)
     {
+        $pathToExpected = "tests/fixtures/expected.{$outputFormat}.txt";
         $expected = file_get_contents($pathToExpected);
-        $actual = genDiff($filePath1, $filePath2, $format);
+        $filePath1 = "tests/fixtures/before.{$inputFormat}";
+        $filePath2 = "tests/fixtures/after.{$inputFormat}";
+        $actual = genDiff($filePath1, $filePath2, $outputFormat);
         $this->assertEquals($expected, $actual);
     }
 
     public function genDiffProvider()
     {
         return [
-            'JsonInPrettyOut' => [
-                'tests/fixtures/before.json',
-                'tests/fixtures/after.json',
-                'pretty',
-                'tests/fixtures/expectedPretty'
-            ],
-            'JsonInPlainOut' => [
-                'tests/fixtures/before.json',
-                'tests/fixtures/after.json',
-                'plain',
-                'tests/fixtures/expectedPlain'
-            ],
-            'JsonInJsonOut' => [
-                'tests/fixtures/before.json',
-                'tests/fixtures/after.json',
-                'json',
-                'tests/fixtures/expectedJson'
-            ],
-            'YamlInPrettyOut' => [
-                'tests/fixtures/before.yml',
-                'tests/fixtures/after.yml',
-                'pretty',
-                'tests/fixtures/expectedPretty'
-            ],
-            'YamlInPlainOut' => [
-                'tests/fixtures/before.yml',
-                'tests/fixtures/after.yml',
-                'plain',
-                'tests/fixtures/expectedPlain'
-            ],
-            'YamlInJsonOut' => [
-                'tests/fixtures/before.yml',
-                'tests/fixtures/after.yml',
-                'json',
-                'tests/fixtures/expectedJson'
-            ]
+            'JsonInPrettyOut' => ['json', 'pretty'],
+            'JsonInPlainOut' => ['json', 'plain'],
+            'JsonInJsonOut' => ['json', 'json'],
+            'YamlInPrettyOut' => ['yml', 'pretty'],
+            'YamlInPlainOut' => ['yml', 'plain'],
+            'YamlInJsonOut' => ['yml', 'json']
         ];
     }
 
