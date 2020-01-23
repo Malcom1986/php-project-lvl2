@@ -2,30 +2,52 @@
 
 namespace Differ\Formatters\PlainFormatter;
 
-use function Differ\Node\{getName, getType, getValue};
+use function Differ\Node\{getName, getType, getNewValue, getOldValue, getChildren};
 use function Funct\Collection\{flatten, compact};
 
 function formatPlain($tree)
 {
     $formatters = [
         'unchanged' => fn () => null,
-        'nested'  => fn ($name, $value, $fn, $stack) => $fn($value, $stack),
-        'added' => fn ($name, $value) => "Property '{$name}' was added with value: '{$value}'",
-        'deleted' => fn ($name) => "Property '{$name}' was removed",
-        'changed' => fn ($name, $value) => "Property '{$name}' was changed. From '{$value['old']}' to '{$value['new']}'"
+        'added' => function ($node, $parents) {
+            $nodeName = getName($node);
+            $propertyName = implode('.', [...$parents, $nodeName]);
+            $newValue = getNewValue($node);
+            $newValuePlain = isComplexValue($newValue) ? 'complex value' : $newValue;
+            return "Property '{$propertyName}' was added with value: '{$newValuePlain}'";
+        },
+        'deleted' => function ($node, $parents) {
+            $nodeName = getName($node);
+            $propertyName = implode('.', [...$parents, $nodeName]);
+            return "Property '{$propertyName}' was removed";
+        },
+        'changed' => function ($node, $parents) {
+            $nodeName = getName($node);
+            $propertyName = implode('.', [...$parents, $nodeName]);
+            $oldValue = getOldValue($node);
+            $newValue = getNewValue($node);
+            $newValuePlain = isComplexValue($newValue) ? 'complex value' : $newValue;
+            return "Property '{$propertyName}' was changed. From '{$oldValue}' to '{$newValuePlain}'";
+        },
+        'nested'  => function ($node, $parents, $func) {
+            $children = getChildren($node);
+            $parents[] = getName($node);
+            return $func($children, $parents);
+        }
     ];
-    
-    $formatPlain = function ($tree, $propNameStack) use (&$formatPlain, $formatters) {
-        return array_map(function ($node) use (&$formatPlain, $formatters, $propNameStack) {
-            array_push($propNameStack, getName($node));
-            $formatValue = $formatters[getType($node)];
-            $propertyName = implode('.', $propNameStack);
-            $value = is_object(getValue($node)) ? 'complex value' : getValue($node);
-            $sentence = $formatValue($propertyName, $value, $formatPlain, $propNameStack);
-            array_pop($propNameStack);
-            return $sentence;
+
+    $formatPlain = function ($tree, $parents = []) use ($formatters, &$formatPlain) {
+        return array_map(function ($node) use ($formatters, $parents, &$formatPlain) {
+            $nodeType = getType($node);
+            $formatNode = $formatters[$nodeType];
+            return $formatNode($node, $parents, $formatPlain);
         }, $tree);
     };
-    $result = compact(flatten($formatPlain($tree, [])));
-    return implode("\n", $result);
+    $parts = compact(flatten($formatPlain($tree)));
+    return implode("\n", $parts);
+}
+
+function isComplexValue($value)
+{
+    return is_object($value) || is_array($value);
 }

@@ -2,31 +2,60 @@
 
 namespace Differ\Formatters\PrettyFormatter;
 
-use function Differ\Node\{getName, getType, getValue};
-use function Differ\Functions\flatten_assoc;
+use function Differ\Node\{getName, getType, getNewValue, getOldValue, getChildren};
 
 function formatPretty($tree)
 {
     $formatters = [
-        'nested' => fn ($key, $value, $fn) => ["  {$key}" => $fn($value)],
-        'added' => fn ($key, $value) => ["+ {$key}" => $value],
-        'deleted' => fn ($key, $value) => ["- {$key}" => $value],
-        'unchanged' => fn ($key, $value) => ["  {$key}" => $value],
-        'changed' => fn ($key, $value) => ["- {$key}" => $value['old'], "+ {$key}" => $value['new']]
+        'added' => function ($acc, $node) {
+            $key = getName($node);
+            $newValue = getNewValue($node);
+            $formatedNewValue = is_object($newValue) ? formatObject($newValue) : $newValue;
+            $acc["+ {$key}"] = $formatedNewValue;
+            return $acc;
+        },
+        'deleted' => function ($acc, $node) {
+            $key = getName($node);
+            $oldValue = getOldValue($node);
+            $formatedOldValue = is_object($oldValue) ? formatObject($oldValue) : $oldValue;
+            $acc["- {$key}"] = $formatedOldValue;
+            return $acc;
+        },
+        'unchanged' => function ($acc, $node) {
+            $key = getName($node);
+            $oldValue = getOldValue($node);
+            $formatedOldValue = is_object($oldValue) ? formatObject($oldValue) : $oldValue;
+            $acc["  {$key}"] = $formatedOldValue;
+            return $acc;
+        },
+        'changed' => function ($acc, $node) {
+            $key = getName($node);
+            $oldValue = getOldValue($node);
+            $formatedOldValue = is_object($oldValue) ? formatObject($oldValue) : $oldValue;
+            $newValue = getNewValue($node);
+            $formatedNewValue = is_object($newValue) ? formatObject($newValue) : $newValue;
+            $acc["- {$key}"] = $formatedOldValue;
+            $acc["+ {$key}"] = $formatedNewValue;
+            return $acc;
+        },
+        'nested' => function ($acc, $node, $func) {
+            $key = getName($node);
+            $children = getChildren($node);
+            $acc["  {$key}"] = $func($children);
+            return $acc;
+        }
     ];
 
-    $formatPretty = function ($tree) use ($formatters, &$formatPretty) {
-        $formattedTree = array_map(function ($node) use ($formatters, &$formatPretty) {
+    $formatPretty = function ($tree) use (&$formatPretty, $formatters) {
+        return array_reduce($tree, function ($acc, $node) use ($formatters, $formatPretty) {
             $nodeType = getType($node);
             $formatNode = $formatters[$nodeType];
-            $key = getName($node);
-            $value = getValue($node);
-            $formatedValue = is_object($value) ? formatObject($value) : $value;
-            return $formatNode($key, $formatedValue, $formatPretty);
-        }, $tree);
-        return flatten_assoc($formattedTree);
+            return $formatNode($acc, $node, $formatPretty);
+        }, []);
     };
-    $json = json_encode($formatPretty($tree), JSON_PRETTY_PRINT);
+
+    $formatedTree = $formatPretty($tree);
+    $json = json_encode($formatedTree, JSON_PRETTY_PRINT);
     return str_replace(['"', ','], '', $json);
 }
 

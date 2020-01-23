@@ -3,44 +3,41 @@
 namespace Differ\Ast;
 
 use function Funct\Collection\union;
-use function Differ\Node\createNode;
+use function Differ\Node\{createNode, createLeaf};
 
 function buildAst($data1, $data2)
 {
     $types = [
         [
-            'type' => 'added',
             'predicate' => fn ($tree1, $tree2, $key) => !isset($tree1->$key),
-            'getValue' => fn ($value1, $value2) => $value2
+            'createNode' => fn ($data1, $data2, $key) => createLeaf($key, 'added', $data2->$key, null)
         ],
         [
-            'type' => 'deleted',
             'predicate' => fn ($tree1, $tree2, $key) => !isset($tree2->$key),
-            'getValue' => fn ($value1) => $value1
+            'createNode' => fn ($data1, $data2, $key) => createLeaf($key, 'deleted', null, $data1->$key)
         ],
         [
-            'type' => 'nested',
             'predicate' => fn ($tree1, $tree2, $key) => is_object($tree1->$key) && is_object($tree2->$key),
-            'getValue' => fn ($value1, $value2) => buildAst($value1, $value2)
+            'createNode' => function ($data1, $data2, $key) {
+                $children = buildAst($data1->$key, $data2->$key);
+                return createNode($key, $children);
+            }
         ],
         [
-            'type' => 'changed',
             'predicate' => fn ($tree1, $tree2, $key) => $tree1->$key !== $tree2->$key,
-            'getValue' => fn ($value1, $value2) => ['old' => $value1, 'new' => $value2]
+            'createNode' => fn ($data1, $data2, $key) => createLeaf($key, 'changed', $data2->$key, $data1->$key)
         ],
         [
-            'type' => 'unchanged',
             'predicate' => fn ($tree1, $tree2, $key) => $tree1->$key === $tree2->$key,
-            'getValue' => fn($value1) => $value1
+            'createNode' => fn ($data1, $data2, $key) => createLeaf($key, 'unchanged', $data2->$key, $data1->$key)
         ]
     ];
 
     $keys = union(getObjectKeys($data1), getObjectKeys($data2));
     return array_map(function ($key) use ($data1, $data2, $types) {
         $nodeType = find($types, fn ($type) => $type['predicate']($data1, $data2, $key));
-        ['type' => $type, 'getValue' => $getValue] = $nodeType;
-        $value = $getValue($data1->$key ?? null, $data2->$key ?? null);
-        return createNode($key, $type, $value);
+        $createNode = $nodeType['createNode'];
+        return $createNode($data1, $data2, $key);
     }, array_values($keys));
 }
 
