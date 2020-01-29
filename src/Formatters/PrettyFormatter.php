@@ -4,67 +4,60 @@ namespace Differ\Formatters\PrettyFormatter;
 
 use function Differ\Node\{getName, getType, getNewValue, getOldValue, getChildren};
 use function Funct\Strings\times;
-
-const START_OFFSET = 2;
+use function Funct\Collection\flatten;
 
 function formatPretty($tree)
 {
     $formatters = [
-        'added' => function ($acc, $node, $offset) {
+        'added' => function ($node, $offset) {
             $name = getName($node);
             $newValue = getNewValue($node);
             $formatedNewValue = stringifyValue($newValue, $offset);
-            $indention = times(' ', $offset + START_OFFSET);
-            $acc[] = "{$indention}+ {$name}: {$formatedNewValue}";
-            return $acc;
+            $indention = times(' ', $offset + 2);
+            return "{$indention}+ {$name}: {$formatedNewValue}";
         },
-        'deleted' => function ($acc, $node, $offset) {
+        'deleted' => function ($node, $offset) {
             $name = getName($node);
             $oldValue = getOldValue($node);
             $formatedOldValue = stringifyValue($oldValue, $offset);
-            $indention = times(' ', $offset + START_OFFSET);
-            $acc[] = "{$indention}- {$name}: {$formatedOldValue}";
-            return $acc;
+            $indention = times(' ', $offset + 2);
+            return"{$indention}- {$name}: {$formatedOldValue}";
         },
-        'unchanged' => function ($acc, $node, $offset) {
+        'unchanged' => function ($node, $offset) {
             $name = getName($node);
             $oldValue = getOldValue($node);
             $formatedOldValue = stringifyValue($oldValue, $offset);
-            $indention = times(' ', $offset + START_OFFSET);
-            $acc[] = "{$indention}  {$name}: {$formatedOldValue}";
-            return $acc;
+            $indention = times(' ', $offset + 2);
+            return "{$indention}  {$name}: {$formatedOldValue}";
         },
-        'changed' => function ($acc, $node, $offset) {
+        'changed' => function ($node, $offset) {
             $name = getName($node);
-            $indention = times(' ', $offset + START_OFFSET);
+            $indention = times(' ', $offset + 2);
             $oldValue = getOldValue($node);
             $formatedOldValue = stringifyValue($oldValue, $offset);
             $newValue = getNewValue($node);
             $formatedNewValue = stringifyValue($newValue, $offset);
-            $acc[] = "{$indention}+ {$name}: {$formatedNewValue}";
-            $acc[] = "{$indention}- {$name}: {$formatedOldValue}";
-            return $acc;
+            return ["{$indention}+ {$name}: {$formatedNewValue}", "{$indention}- {$name}: {$formatedOldValue}"];
         },
-        'nested' => function ($acc, $node, $offset, $func) {
+        'nested' => function ($node, $offset, $func) {
             $name = getName($node);
-            $indention = times(' ', $offset + START_OFFSET);
+            $indention = times(' ', $offset + 2);
             $children = getChildren($node);
             $offset += 4;
             $formatedChildren = $func($children, $offset);
-            $acc[] = "{$indention}  {$name}: {$formatedChildren}";
-            return $acc;
+            return "{$indention}  {$name}: {$formatedChildren}";
         }
     ];
 
     $formatPretty = function ($tree, $offset = 0) use (&$formatPretty, $formatters) {
-        $formatted = array_reduce($tree, function ($acc, $node) use ($formatters, $formatPretty, $offset) {
+        $formattedTree = array_map(function ($node) use ($formatters, $formatPretty, $offset) {
             $nodeType = getType($node);
             $formatNode = $formatters[$nodeType];
-            return $formatNode($acc, $node, $offset, $formatPretty);
-        }, []);
-        $string = implode("\n", $formatted);
+            return $formatNode($node, $offset, $formatPretty);
+        }, $tree);
+        $treeAsString = implode("\n", flatten($formattedTree));
         $indention = times(' ', $offset);
-        return "{\n{$string}\n{$indention}}";
+        return "{\n{$treeAsString}\n{$indention}}";
     };
 
     return $formatPretty($tree);
@@ -88,9 +81,14 @@ function stringifyValue($value, $offset)
 function stringifyObject($object, $offset)
 {
     $indention = times(' ', $offset + 4);
-    $formated = collect($object)->map(function ($value, $key) use ($indention) {
+    $formatedObject = collect($object)->map(function ($value, $key) use ($indention) {
+        if (is_object($value)) {
+            $offset += 4;
+            $formatedChildren = stringifyObject($value, $offset);
+            return "{$indention}   {$key}: {$formatedChildren}";
+        }
         return "{$indention}   {$key}: {$value}";
     })->all();
-    $string = implode("\n", $formated);
-    return "{\n{$string}\n{$indention}}";
+    $objectAsString = implode("\n", $formatedObject);
+    return "{\n{$objectAsString}\n{$indention}}";
 }
