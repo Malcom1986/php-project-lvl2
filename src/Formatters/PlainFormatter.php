@@ -11,22 +11,22 @@ function formatPlain($tree)
         'unchanged' => fn () => null,
         'added' => function ($node, $parents) {
             $nodeName = getName($node);
-            $propertyName = implode('.', [...$parents, $nodeName]);
+            $propertyName = buildPropertyName($nodeName, $parents);
             $newValue = getNewValue($node);
-            $newValuePlain = isComplexValue($newValue) ? 'complex value' : $newValue;
+            $newValuePlain = stringifyValue($newValue);
             return "Property '{$propertyName}' was added with value: '{$newValuePlain}'";
         },
         'deleted' => function ($node, $parents) {
             $nodeName = getName($node);
-            $propertyName = implode('.', [...$parents, $nodeName]);
+            $propertyName = buildPropertyName($nodeName, $parents);
             return "Property '{$propertyName}' was removed";
         },
         'changed' => function ($node, $parents) {
             $nodeName = getName($node);
-            $propertyName = implode('.', [...$parents, $nodeName]);
+            $propertyName = buildPropertyName($nodeName, $parents);
             $oldValue = getOldValue($node);
             $newValue = getNewValue($node);
-            $newValuePlain = isComplexValue($newValue) ? 'complex value' : $newValue;
+            $newValuePlain = stringifyValue($newValue);
             return "Property '{$propertyName}' was changed. From '{$oldValue}' to '{$newValuePlain}'";
         },
         'nested'  => function ($node, $parents, $func) {
@@ -50,4 +50,14 @@ function formatPlain($tree)
 function isComplexValue($value)
 {
     return is_object($value) || is_array($value);
+}
+
+function buildPropertyName($nodeName, $parents)
+{
+    return implode('.', [...$parents, $nodeName]);
+}
+
+function stringifyValue($value)
+{
+    return isComplexValue($value) ? 'complex value' : $value;
 }
